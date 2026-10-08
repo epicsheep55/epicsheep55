@@ -153,7 +153,14 @@ image_file = st.camera_input("Take a clear selfie in neutral lighting")
 if image_file is not None:
     bytes_data = image_file.getvalue()
     np_arr = np.frombuffer(bytes_data, np.uint8)
-    image_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    try:
+        image_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    except cv2.error:
+        image_bgr = None
+
+    if image_bgr is None:
+        st.error("Unable to read the photo. Please retake it and try again.")
+        st.stop()
 
     face = detect_face_bgr(image_bgr)
     if face is None:
